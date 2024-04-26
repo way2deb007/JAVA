@@ -1,0 +1,94 @@
+import java.io.*;
+import java.util.*;
+
+class Employee implements Serializable {
+    String name;
+    int id;
+    String designation;
+    double salary;
+    
+    public Employee(String name, int id, String designation, double salary) {
+        this.name = name;
+        this.id = id;
+        this.designation = designation;
+        this.salary = salary;
+    }
+    
+    @Override
+    public String toString() {
+        return "Name: " + name + "\nID: " + id + "\nDesignation: " + designation + "\nSalary: " + salary + "\n";
+    }
+}
+
+public class Main {
+    static final String FILE_NAME = "employees.dat";
+    static List<Employee> employees = new ArrayList<>();
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+        
+        do {
+            System.out.println("\n1. Add an Employee");
+            System.out.println("2. Display All");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            
+            switch (choice) {
+                case 1:
+                    addEmployee(scanner);
+                    break;
+                case 2:
+                    displayAll();
+                    break;
+                case 3:
+                    System.out.println("Exiting program!");
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        } while (choice != 3);
+        
+        scanner.close();
+    }
+    
+    static void addEmployee(Scanner scanner) {
+        System.out.print("Enter employee name: ");
+        String name = scanner.nextLine();
+        System.out.print("Enter employee ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+        System.out.print("Enter employee designation: ");
+        String designation = scanner.nextLine();
+        System.out.print("Enter employee salary: ");
+        double salary = scanner.nextDouble();
+        
+        Employee employee = new Employee(name, id, designation, salary);
+        employees.add(employee);
+        
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME));
+            out.writeObject(employees);
+            out.close();
+            System.out.println("Employee details added successfully!");
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+    
+    static void displayAll() {
+        try {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE_NAME));
+            employees = (List<Employee>) in.readObject();
+            in.close();
+            System.out.println("Employee details:");
+            for (Employee employee : employees) {
+                System.out.println(employee);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+}
